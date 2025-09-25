@@ -61,7 +61,7 @@ const NavBar = () => {
                                 label="My Bookings"
                                 // ✅ add the dashboard icon here
                                 labelIcon={<img src={assets.dashboardIcon} alt="Dashboard" style={{ width: 18, height: 18 }} />}
-                                onClick={() => navigate('/My-bookings')}
+                                onClick={() => navigate('/my-bookings')}
                             />
                         </UserButton.MenuItems>
                     </UserButton>
@@ -80,7 +80,7 @@ const NavBar = () => {
                                 label="My Bookings"
                                 // ✅ add the dashboard icon here
                                 labelIcon={<img src={assets.dashboardIcon} alt="Dashboard" style={{ width: 18, height: 18 }} />}
-                                onClick={() => navigate('/My-bookings')}
+                                onClick={() => navigate('/MyBookings')}
                             />
                         </UserButton.MenuItems>
                     </UserButton>}
