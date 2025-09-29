@@ -12,4 +12,5 @@ const userSchema = mongoose.Schema({
 const User = mongoose.model('User', userSchema,);  
 // last 'user' means it will use "user" collection in MongoDB
 
+
 export default User;
