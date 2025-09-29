@@ -7,8 +7,8 @@ const connectDB = async () => {
 
     await mongoose.connect(process.env.MONGODB_URI, {
       dbName: 'hotel-booking',
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+    //   useNewUrlParser: true,
+    //   useUnifiedTopology: true,
     });
   } catch (error) {
     console.log('DB connection failed:', error.message);
