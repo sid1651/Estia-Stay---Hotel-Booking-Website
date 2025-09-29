@@ -5,6 +5,12 @@ const clerkWebhooks = async (req, res) => {
   try {
     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
+    console.log(process.env.CLERK_WEBHOOK_SECRET)
+    console.log(process.env.CLERK_PUBLISHABLE_KEY)
+    console.log(process.env.CLERK_SECRET_KEY)
+    
+
+
     const headers = {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
@@ -13,6 +19,8 @@ const clerkWebhooks = async (req, res) => {
 
     // Verify webhook
     await wh.verify(JSON.stringify(req.body), headers);
+
+    console.log("Verrrrified!!!")
 
     // 👇 Add this log to see what Clerk is sending
     console.log("📩 Webhook payload:", JSON.stringify(req.body, null, 2));
