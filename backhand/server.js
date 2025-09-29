@@ -10,7 +10,7 @@ app.use(cors())
 connectDB()
 app.use(clerkMiddleware())
 app.use(express.json())
-app.use("/api/clerk",clerkWebhooks)
+app.use("/api/clerk",clerkWebhooks)  
 
 
 app.get('/', (req,res)=>res.send("Api is working"))

@@ -14,6 +14,9 @@ const clerkWebhooks = async (req, res) => {
     // Verify webhook
     await wh.verify(JSON.stringify(req.body), headers);
 
+    // 👇 Add this log to see what Clerk is sending
+    console.log("📩 Webhook payload:", JSON.stringify(req.body, null, 2));
+
     const { data, type } = req.body;
 
     const userData = {
