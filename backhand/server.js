@@ -13,7 +13,9 @@ app.use(express.json())
 app.use("/api/clerk",clerkWebhooks)  
 
 
-app.get('/', (req,res)=>{res.send("Api is working");console.log("haha")})
+app.get('/', (req,res)=>{res.send("Api is working");console.log("haha");console.log(process.env.CLERK_WEBHOOK_SECRET);
+    console.log(process.env.CLERK_PUBLISHABLE_KEY);
+    console.log(process.env.CLERK_SECRET_KEY);})
 
 const port=process.env.PORT||3000;
 
