@@ -5,12 +5,6 @@ const clerkWebhooks = async (req, res) => {
   try {
     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
-    console.log(process.env.CLERK_WEBHOOK_SECRET)
-    console.log(process.env.CLERK_PUBLISHABLE_KEY)
-    console.log(process.env.CLERK_SECRET_KEY)
-    
-
-
     const headers = {
       "svix-id": req.headers["svix-id"],
       "svix-timestamp": req.headers["svix-timestamp"],
@@ -19,37 +13,42 @@ const clerkWebhooks = async (req, res) => {
 
     // Verify webhook
     await wh.verify(JSON.stringify(req.body), headers);
-
-    console.log("Verrrrified!!!")
-
-    // 👇 Add this log to see what Clerk is sending
-    console.log("📩 Webhook payload:", JSON.stringify(req.body, null, 2));
+    console.log("✅ Verified webhook");
 
     const { data, type } = req.body;
 
-    const userData = {
-      _id: data.id,
-      email: data.email_addresses[0].email_address,
-      username: `${data.first_name} ${data.last_name}`,
-      image: data.image_url,
-    };
-
     switch (type) {
-      case "user.created":
-        console.log("user created ")
+      case "user.created": {
+        const userData = {
+          _id: data.id,
+          email: data.email_addresses?.[0]?.email_address || "",
+          username: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
+          image: data.image_url || "",
+        };
         await User.create(userData);
+        console.log("👤 User created in DB");
         break;
+      }
 
-      case "user.updated":
+      case "user.updated": {
+        const userData = {
+          email: data.email_addresses?.[0]?.email_address || "",
+          username: `${data.first_name || ""} ${data.last_name || ""}`.trim(),
+          image: data.image_url || "",
+        };
         await User.findByIdAndUpdate(data.id, userData);
+        console.log("🔄 User updated in DB");
         break;
+      }
 
-      case "user.deleted":
-        console.log("user deleted ")
+      case "user.deleted": {
         await User.findByIdAndDelete(data.id);
+        console.log("🗑️ User deleted from DB");
         break;
+      }
 
       default:
+        console.log(`⚠️ Unhandled event: ${type}`);
         break;
     }
 
