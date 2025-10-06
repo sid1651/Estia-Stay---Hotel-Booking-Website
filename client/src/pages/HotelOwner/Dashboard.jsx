@@ -1,10 +1,34 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { assets, dashboardDummyData } from '../../assets/assets'
+import { useAppContext } from '../../context/AppContext';
 
 const Dashboard = () => {
-    const [dashboardData,setDashboardData]=useState(dashboardDummyData);
+    const {currency,user,getToken,toast,axios}=useAppContext()
+    const [dashboardData,setDashboardData]=useState({
+        bookings:[],
+        totalBookings:0,
+        totalRevenue:0,
+    });
 
-  return (
+    const fetchDashboardData=async() =>{
+        try{
+const {data}=await axios.get('/api/bookings/hotel',{headers:{Authorization:`Bearer ${await getToken()}`}})
+if(data.success){
+    setDashboardData(data.dashboardData)
+}else{
+    toast.error(error.message)
+}
+        }catch(error){
+toast.error(error.message)
+        }
+    }
+
+    useEffect(()=>{
+if(user){
+    fetchDashboardData()
+}
+    },[user])
+     return (
     <div className="dashboard-container">
       <h1 className="dashboard-title">Dashboard</h1>
 
@@ -23,7 +47,7 @@ const Dashboard = () => {
             <img src={assets.totalRevenueIcon} className="stat-icon" alt="Total Revenue"/>
             <div className="stat-info">
                 <p className="stat-label">Total Revenu</p>
-                <p className="stat-value">${dashboardData.totalRevenue}</p>
+                <p className="stat-value">{currency}{dashboardData.totalRevenue}</p>
             </div>
         </div>
       </div>
@@ -45,7 +69,7 @@ const Dashboard = () => {
                     <tr  key={index}>
                         <td className='td-design'>{item.user.username}</td>
                         <td className='td-design'>{item.room.roomType}</td>
-                        <td className='td-design'>${item.totalPrice}</td>
+                        <td className='td-design'>{currency}{item.totalPrice}</td>
                         <td>
                             <button className={`payment-status ${item.isPaid ? 'paid' : 'pending'}`}>
                                 {item.isPaid?'Completed':'Pending'}

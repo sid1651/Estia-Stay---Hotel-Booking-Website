@@ -1,10 +1,17 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../../components/HotelOwner/Navbar'
 import Sidebar from '../../components/HotelOwner/Sidebar'
 import { Outlet } from 'react-router'
+import { useAppContext } from '../../context/AppContext'
 
 const Layout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const {isOwner,navigate}=useAppContext()
+  useEffect(()=>{
+if(!isOwner){
+  navigate('/')
+}
+  },[isOwner])
 
   return (
     <div className="layout-container">

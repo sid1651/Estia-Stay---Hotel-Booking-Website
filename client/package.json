@@ -11,10 +11,12 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.47.0",
+    "axios": "^1.12.2",
     "dom": "^0.0.3",
     "nodemon": "^3.1.10",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-hot-toast": "^2.6.0",
     "react-router-dom": "^7.9.1",
     "router": "^2.2.0"
   },
