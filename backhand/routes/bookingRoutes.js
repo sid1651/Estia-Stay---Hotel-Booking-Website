@@ -5,7 +5,8 @@ import { protect } from "../midelware/authMiddleware.js";
 
 const bookingRouter=express.Router();
 
-bookingRouter.post('/check-avaiulibility',checkAvailibilityAPI)
+bookingRouter.post('/check-availability', checkAvailibilityAPI)
+
 bookingRouter.post('/book',protect,createBooking)
 bookingRouter.get('/user',protect,getUserBookings)
 bookingRouter.get('/hotel',protect,getHotelBookings)

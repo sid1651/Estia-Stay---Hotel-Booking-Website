@@ -1,20 +1,71 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { assets, facilityIcons, roomCommonData, roomsDummyData } from "../assets/assets";
+import { assets, facilityIcons, roomCommonData,  } from "../assets/assets";
 import StarRating from "../components/StarRating";
+import { useAppContext } from "../context/AppContext";
+import toast from "react-hot-toast";
+
 
 const RoomDetails = () => {
   const { id } = useParams();
+  const {rooms,getToken,axios,navigate}=useAppContext()
   const [room, setRoom] = useState(null);
   const [mainImage, setMainImage] = useState(null);
+  const [checkInDate,setCheckInDate]=useState(null);
+  const [checkOutDate,setCheckOutDate]=useState(null);
+  const [guest,setGuest]=useState(1);
 
+  const [isAvailable,setIsAvailabel]=useState(false)
+  
+const checkAvailibility=async()=>{
+  try{
+if(checkInDate>=checkOutDate){
+  toast.error('check in date shode be less than check out date')
+  return
+}
+const {data}=await axios.post('/api/bookings/check-availability',{room:id,checkInDate,checkOutDate})
+if (data.success){
+  if(data.isAvailable){
+    setIsAvailabel(true)
+    toast.success('Room is availabel')
+  }else{
+    setIsAvailabel(false)
+    toast.error('Room is not availabel')
+  }
+}else{
+  toast.error(data.message)
+}
+  }catch(error){
+toast.error(error.message)
+  }
+}
+
+
+const onSubmitHandeler=async(e)=>{
+try{
+e.preventDefault();
+if(!isAvailable){
+  return checkAvailibility()
+}else{
+   const {data}=await axios.post('/api/bookings/book',{room:id,checkInDate,checkOutDate,guests: guest,paymentMethod:'pay at hotel'},{headers:{Authorization:`Bearer ${await getToken()}`}})
+  if(data.success){
+    toast.success(data.message)
+    navigate('/my-booking')
+    scrollTo(0,0)
+  }else{
+    toast.error(data.message)
+  }
+}
+}catch(error){
+  toast.error(error.message)
+}
+}
   useEffect(() => {
-    const foundRoom = roomsDummyData.find((room) => room._id === id);
-    if (foundRoom) {
-      setRoom(foundRoom);
-      setMainImage(foundRoom.images[0]);
-    }
-  }, [id]);
+  const room = rooms.find(room => room._id === id);
+  room && setRoom(room);
+  room && setMainImage(room.images[0]);
+}, [rooms]);
+
 
   if (!room) return <p className="loading">Loading Room...</p>;
 
@@ -68,36 +119,41 @@ const RoomDetails = () => {
   {/* Amenities + Price in one row */}
   <div className="amenities-price-row">
     <div className="amenities-list">
-      {room.amenities.map((item, index) => (
-        <div className="amenity-pill" key={index}>
-          <img src={facilityIcons[item]} alt={item} className="amenity-icon" />
-          <span>{item}</span>
-        </div>
-      ))}
-    </div>
+  {room.Amenities?.length > 0 ? (
+    room.Amenities.map((item, index) => (
+      <div className="amenity-pill" key={index}>
+        <img src={facilityIcons[item]} alt={item} className="amenity-icon" />
+        <span>{item}</span>
+      </div>
+    ))
+  ) : (
+    <p>No amenities listed.</p>
+  )}
+</div>
+
     <p className="room-price">${room.pricePerNight}/night</p>
   </div>
 </div>
 
 {/* Booking Form */}
-<form className="booking-form">
+<form onSubmit={onSubmitHandeler} className="booking-form">
   <div className="form-inline">
     <div className="form-group">
       <label htmlFor="checkInDate">Check-In</label>
-      <input type="date" id="checkInDate" />
+      <input onChange={(e)=>setCheckInDate(e.target.value)} min={new Date().toISOString().split('T')[0]}    type="date" id="checkInDate" />
     </div>
 
     <div className="form-group">
       <label htmlFor="checkOutDate">Check-Out</label>
-      <input type="date" id="checkOutDate" />
+      <input onChange={(e)=>setCheckOutDate(e.target.value)} min={checkInDate}  disabled={!checkInDate} type="date" id="checkOutDate" />
     </div>
 
     <div className="form-group">
       <label htmlFor="guest">Guests</label>
-      <input type="number" id="guest" placeholder="0" required />
+      <input onChange={(e)=>setGuest(e.target.value)} value={guest} type="number" id="guest" placeholder="0" required />
     </div>
 
-    <button type="submit" className="book-btn">Check Availability</button>
+    <button type="submit" className="book-btn">{isAvailable?"Book Now":"Check Availability"}</button>
   </div>
 </form>
       <div className="room-specs">
@@ -125,7 +181,7 @@ const RoomDetails = () => {
 </div>
 <div className="host-section">
   <div className="host-info">
-    <img src={room.hotel.owner.image} alt="Host" className="host-image" />
+    <img src={room.hotel?.owner?.image} alt="Host" className="host-image" />
     <div className="host-details">
       <p className="hosted-by">Hosted by {room.hotel.name}</p>
       <div className="host-reviews">

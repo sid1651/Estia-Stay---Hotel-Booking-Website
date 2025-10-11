@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv'
+
 import cors from 'cors'
 import connectDB from './config/db.js';
 import { clerkMiddleware } from '@clerk/express'
@@ -9,14 +10,20 @@ import hotelRouter from './routes/hotelRoutes.js';
 import connectCloudinary from './config/cloudinary.js';
 import roomRouter from './routes/roomRoutes.js';
 import bookingRouter from './routes/bookingRoutes.js';
+import transporter from './config/nodemailer.js';
+
+
 dotenv.config();
 const app=express()
 app.use(cors())
 connectDB()
 connectCloudinary();
+
+
+app.use("/api/clerk",clerkWebhooks) 
 app.use(clerkMiddleware())
 app.use(express.json())
-app.use("/api/clerk",clerkWebhooks)  
+
 
 
 app.get('/', (req,res)=>{res.send("Api is working");console.log("haha");console.log(process.env.CLERK_WEBHOOK_SECRET);

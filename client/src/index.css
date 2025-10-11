@@ -695,7 +695,7 @@ body {
 }
 
 .testimonial-review {
-  font-size: 1.95rem;
+  font-size: 1.55rem;
   color: #555;
   line-height: 1.5;
   margin-top: 1rem;
@@ -1251,7 +1251,8 @@ body {
 /* Container */
 .room-details-container {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 3rem auto 0 auto;
+
   padding: 2rem 1rem;
   font-family: "Poppins", sans-serif;
   color: #2d2d2d;
@@ -1679,6 +1680,7 @@ body {
 /* {booking page} */
 /* Container */
 .my-bookings-container {
+  margin-top: 5rem;
   padding: 2rem;
   background-color: #f8f9fa;
   font-family: "Inter", sans-serif;
@@ -1746,11 +1748,14 @@ body {
 }
 
 .hotel-info .hotel-name {
+  font-family: 'Playfair Display', serif;
+  
   font-weight: 600;
   color: #111827;
 }
 
 .hotel-info .room-type {
+  font-family: Georgia, 'Times New Roman', Times, serif;
   font-size: 0.85rem;
   color: #6b7280;
 }
@@ -1795,9 +1800,21 @@ body {
 }
 
 .booking-payment {
+  
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem; /* space between circle and text */
+  
+  gap: 0.9rem; /* space between circle and text */
+}
+
+.pay-button{
+  color:black;
+  font-size: 1.2rem;
+  border-radius: 99px;
+  border: 2px solid black;
+  padding: 6px;
+  font-weight: 550;
 }
 
 .payment-status {
@@ -1806,12 +1823,29 @@ body {
   border-radius: 50%;
 }
 
-.payment-status.paid {
-  background-color: #16a34a; /* green */
+.booking-dates{
+  flex: 1 1 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 15px;
+  background-color: #f7f9fc;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin-right: 200px;
 }
 
-.payment-status.unpaid {
-  background-color: #dc2626; /* red */
+.payment-paid {
+  
+  color: #2d8a4f; /* Green text */
+}
+
+.payment-unpaid {
+  
+  color: #d32f2f; /* Red text */
 }
 
 .booking-payment p {
@@ -2461,6 +2495,8 @@ width: 12vw;
   width: 18px;
   height: 18px;
 }
+
+
 
 
 /* ===== Responsive Adjustments ===== */

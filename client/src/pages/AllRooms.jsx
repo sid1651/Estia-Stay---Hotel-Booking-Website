@@ -1,12 +1,82 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { assets, facilityIcons, roomsDummyData } from '../assets/assets'
-import { useNavigate } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import StarRating from '../components/StarRating';
+import { useAppContext } from '../context/AppContext';
 
 const AllRooms = () => {
-  const navigate = useNavigate();
+  const [searchParams,setSeacrcParams]=useSearchParams();
+  const {rooms,navigate,currency}=useAppContext();
   const [openFilters,setOpenFilters]=useState(false);
-  const CheckBox=({label,selected=false,onchange=()=>{}})=>{
+  const [selectedFilters,setSelectedFilters]=useState({
+    roomType:[],
+    priceRange:[],
+  })
+  const [selectedsort,setSelectedSort]=useState('');
+
+
+  const handleFilterChange=(checked,value,type)=>{
+    setSelectedFilters((prevFilters)=>{
+      const updatedFilters={...prevFilters};
+      if(checked){
+        updatedFilters[type].push(value);
+      }else{
+        updatedFilters[type]=updatedFilters[type].filter(item=>item!==value)
+      }
+      return updatedFilters
+    })
+  }
+
+  const handelSortChange=(sortOption)=>{
+    setSelectedSort(sortOption)
+  }
+
+  const matchesRoomType=(room)=>{
+    return selectedFilters.roomType.length===0||selectedFilters.roomType.includes(room.roomType)
+  }
+
+
+  const matchesPriceRange=(room)=>{
+    return selectedFilters.priceRange.length===0||selectedFilters.priceRange.some(range=>{
+      const [min,max]=range.split(' to ').map(Number)
+      return room.pricePerNight>=min && room.pricePerNight<=max
+    })
+  }
+
+  const sortRooms=(a,b)=>{
+    if(selectedsort==='Price Low to High'){
+      return a.pricePerNight-b.pricePerNight;
+    }else if(selectedsort==="Price High to Low"){
+      return b.pricePerNight-a.pricePerNight
+    }else if(selectedsort==='Newest First'){
+      return new Date(b.createdAt)-new Date(a.createdAt)
+    }
+    return 0;
+  }
+  const filterDestination=(room)=>{
+    const destination =searchParams.get('destination');
+    if(!destination)return true;
+    return room.hotel.city.toLowerCase().includes(destination.toLowerCase())
+  }
+
+
+  const filteredRooms =useMemo(()=>{
+    return rooms.filter(room=>matchesRoomType(room)&& matchesPriceRange(room)&& filterDestination(room)).sort(sortRooms);
+  },[rooms,selectedFilters,selectedsort,searchParams])
+
+
+  const clearFilters=()=>{
+    setSelectedFilters({
+      roomType:[],
+      priceRange:[]
+    })
+    setSelectedSort('')
+    setSeacrcParams({})
+  }
+
+
+
+    const CheckBox=({label,selected=false,onChange=()=>{}})=>{
     return(
     <label>
         <input type='checkbox' checked={selected} onChange={(e)=>onChange(e.target.checked,label)}/>
@@ -58,24 +128,26 @@ const AllRooms = () => {
         <p className="filter-title">Popular Filters</p>
         <p className="filter-title">Room Type</p>
         {roomTypes.map((room, index) => (
-          <CheckBox key={index} label={room} />
+          <CheckBox key={index} label={room}selected={selectedFilters.roomType.includes(room)} onChange={(checked)=>handleFilterChange(checked,room,'roomType')}/>
         ))}
 
         <p className="filter-title">Price Range</p>
         {priceRange.map((range, index) => (
-          <CheckBox key={index} label={`$${range}`} />
+          <CheckBox key={index} label={`$${range}`} selected={selectedFilters.priceRange.includes(range)} onChange={(checked)=>{
+            handleFilterChange(checked,range,'priceRange')
+          }} />
         ))}
 
         <p className="filter-title">Sort By</p>
         {sortOptions.map((option, index) => (
-          <RadioButton key={index} label={option} />
+          <RadioButton key={index} label={option} selected={selectedsort===option}onChange={()=>handelSortChange(option)} />
         ))}
       </div>
     </div>
 
     {/* Rooms Section */}
     <div className="rooms-list">
-      {roomsDummyData.map((room) => (
+      {filteredRooms.map((room) => (
         <div className="room-card" key={room._id}>
           <div className="room-image-wrapper">
             <img
@@ -102,7 +174,7 @@ const AllRooms = () => {
             </div>
 
             <div className="amenities">
-              {room.amenities.map((item, index) => (
+              {room.amenities?.map((item, index) => (
                 <div className="amenity" key={index}>
                   <img src={facilityIcons[item]} alt={item} />
                   <p>{item}</p>
