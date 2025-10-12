@@ -10,7 +10,7 @@ import hotelRouter from './routes/hotelRoutes.js';
 import connectCloudinary from './config/cloudinary.js';
 import roomRouter from './routes/roomRoutes.js';
 import bookingRouter from './routes/bookingRoutes.js';
-import transporter from './config/nodemailer.js';
+
 
 
 dotenv.config();
@@ -22,6 +22,7 @@ app.use(clerkMiddleware())
 app.use("/api/clerk",clerkWebhooks) 
 console.log(process.env.CLERK_WEBHOOK_SECRET)
 app.use(express.json())
+connectDB(); // Called somewhere in your main file
 
 
 

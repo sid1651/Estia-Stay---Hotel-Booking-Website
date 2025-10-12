@@ -12,6 +12,8 @@ const connectDB = async () => {
     });
   } catch (error) {
     console.log('DB connection failed:', error.message);
+  }finally{
+console.log("triinnnnnn")
   }
 };
 
