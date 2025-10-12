@@ -50,7 +50,7 @@ if(!isAvailable){
    const {data}=await axios.post('/api/bookings/book',{room:id,checkInDate,checkOutDate,guests: guest,paymentMethod:'pay at hotel'},{headers:{Authorization:`Bearer ${await getToken()}`}})
   if(data.success){
     toast.success(data.message)
-    navigate('/my-booking')
+    navigate('/my-bookings')
     scrollTo(0,0)
   }else{
     toast.error(data.message)
