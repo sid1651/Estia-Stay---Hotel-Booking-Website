@@ -181,7 +181,7 @@ if(!isAvailable){
 </div>
 <div className="host-section">
   <div className="host-info">
-    <img src={room.hotel?.owner?.image} alt="Host" className="host-image" />
+    
     <div className="host-details">
       <p className="hosted-by">Hosted by {room.hotel.name}</p>
       <div className="host-reviews">
