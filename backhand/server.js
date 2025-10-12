@@ -19,9 +19,9 @@ app.use(cors({ origin: 'http://localhost:5173' }));
 connectDB()
 connectCloudinary();
 
-
-app.use("/api/clerk",clerkWebhooks) 
 app.use(clerkMiddleware())
+app.use("/api/clerk",clerkWebhooks) 
+
 app.use(express.json())
 
 
