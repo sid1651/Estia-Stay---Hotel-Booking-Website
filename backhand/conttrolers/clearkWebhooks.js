@@ -6,6 +6,7 @@ const clerkWebhooks = async (req, res) => {
   console.log("--- Clerk Webhook Endpoint Hit ---");
 
   try {
+    
     const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
 
     const headers = {

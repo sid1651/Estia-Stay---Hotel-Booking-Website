@@ -15,13 +15,13 @@ import transporter from './config/nodemailer.js';
 
 dotenv.config();
 const app=express()
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ origin: process.env.CORS }));
 connectDB()
 connectCloudinary();
 
 app.use(clerkMiddleware())
 app.use("/api/clerk",clerkWebhooks) 
-
+console.log(process.env.CLERK_WEBHOOK_SECRET)
 app.use(express.json())
 
 
