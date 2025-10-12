@@ -18,11 +18,12 @@ const app=express()
 app.use(cors({ origin: 'https://estiastay.vercel.app' }));
 connectCloudinary();
 
-app.use(clerkMiddleware())
-app.use("/api/clerk",clerkWebhooks) 
 console.log(process.env.CLERK_WEBHOOK_SECRET)
 app.use(express.json())
-connectDB(); // Called somewhere in your main file
+connectDB(); 
+
+app.use(clerkMiddleware())
+app.use("/api/clerk",clerkWebhooks) 
 
 
 
