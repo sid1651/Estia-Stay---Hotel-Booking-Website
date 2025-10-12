@@ -15,8 +15,7 @@ import transporter from './config/nodemailer.js';
 
 dotenv.config();
 const app=express()
-app.use(cors({ origin: process.env.CORS }));
-connectDB()
+app.use(cors({ origin: 'https://estiastay.vercel.app' }));
 connectCloudinary();
 
 app.use(clerkMiddleware())
