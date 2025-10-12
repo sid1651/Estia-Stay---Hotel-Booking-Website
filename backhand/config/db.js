@@ -12,6 +12,7 @@ const connectDB = async () => {
     });
   } catch (error) {
     console.log('DB connection failed:', error.message);
+    console.log(process.env.MONGODB_URI)
   }finally{
 console.log("triinnnnnn")
   }
