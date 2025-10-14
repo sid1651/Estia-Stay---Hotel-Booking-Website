@@ -86,7 +86,7 @@ const AllRooms = () => {
   }
 
 
-  const RadioButton=({label,selected=false,onchange=()=>{}})=>{
+  const RadioButton=({label,selected=false,onChange=()=>{}})=>{
     return(
     <label>
         <input type='radio' name='sortOption'checked={selected} onChange={()=>onChange(label)}/>
@@ -128,7 +128,7 @@ const AllRooms = () => {
         <p className="filter-title">Popular Filters</p>
         <p className="filter-title">Room Type</p>
         {roomTypes.map((room, index) => (
-          <CheckBox key={index} label={room}selected={selectedFilters.roomType.includes(room)} onChange={(checked)=>handleFilterChange(checked,room,'roomType')}/>
+          <CheckBox key={index} label={room} selected={selectedFilters.roomType.includes(room)} onChange={(checked)=>handleFilterChange(checked,room,'roomType')}/>
         ))}
 
         <p className="filter-title">Price Range</p>

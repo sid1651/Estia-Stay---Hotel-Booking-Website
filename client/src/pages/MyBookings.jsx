@@ -30,6 +30,20 @@ const MyBookings = () => {
     }
   }, [user]);
 
+
+  const handelPayment=async(bookingId)=>{
+    try{
+const {data}=await axios.post('/api/bookings/stripe_payment',{bookingId},{headers: { Authorization: `Bearer ${await getToken()}` }})
+if(data.success){
+  window.location.href=data.url
+}else{
+  toast.error(data.message)
+}
+    }catch(error){
+toast.error(error.message)
+    }
+  }
+
   return (
     <div className="my-bookings-container">
       <header className="bookings-header">
@@ -92,7 +106,7 @@ const MyBookings = () => {
               >
                 <p>{booking.isPaid ? "Paid" : "Not Paid"}</p>
 
-                {!booking.isPaid?<button className="pay-button">Pay now</button>:"Alredy paid"}
+                {!booking.isPaid?<button onClick={()=>handelPayment(booking._id)}className="pay-button">Pay now</button>:"Alredy paid"}
               </div>
             </div>
           );

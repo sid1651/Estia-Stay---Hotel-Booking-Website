@@ -10,12 +10,14 @@ import hotelRouter from './routes/hotelRoutes.js';
 import connectCloudinary from './config/cloudinary.js';
 import roomRouter from './routes/roomRoutes.js';
 import bookingRouter from './routes/bookingRoutes.js';
+import { stripeWebhooks } from './conttrolers/stripeWebhook.js';
 
 
 
 dotenv.config();
 const app=express()
-app.use(cors({ origin: 'https://estiastay.vercel.app' }));
+app.use(cors());
+app.post('/api/stripe',express.raw({type:'application/json'}),stripeWebhooks)
 connectCloudinary();
 
 console.log(process.env.CLERK_WEBHOOK_SECRET)

@@ -22,6 +22,7 @@ export const AppProvider = ({ children }) => {
   const fetchRooms = async () => {
     try {
       const { data } = await axios.get("/api/rooms");
+      console.log(import.meta.env.VITE_BACKEND_URL)
       if (data.success) {
         setRooms(data.rooms);
       } else {
