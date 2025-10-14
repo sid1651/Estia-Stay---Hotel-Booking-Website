@@ -63,7 +63,7 @@ const Addroom = () => {
             Object.keys(images).forEach((key) => {
                 images[key] && formData.append('images', images[key]);
             });
-            console.log("Backend URL:", import.meta.env.VITE_BACKEND_URL);
+           
 
             const { data } = await axios.post(`/api/rooms/`, formData, { headers: { Authorization: `Bearer ${await getToken()}` } });
 
