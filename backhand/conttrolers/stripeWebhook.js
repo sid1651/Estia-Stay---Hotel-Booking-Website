@@ -52,4 +52,5 @@ export const stripeWebhooks = async (req, res) => {
     }
 
     res.json({ received: false});
+    console.log("📬 Response sent to Stripe");
 };
