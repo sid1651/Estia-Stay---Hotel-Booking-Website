@@ -2,7 +2,7 @@ import transporter from "../config/nodemailer.js";
 import Booking from "../models/Booking.js";
 import Hotel from "../models/stay.js";
 import Room from "../models/Room.js";
-import stripe from "stripe";
+import Stripe from "stripe";
 
 const checkAvailability = async ({ checkInDate, checkOutDate, room }) => {
   try {
@@ -148,7 +148,7 @@ const roomData=await Room.findById(booking.room).populate('hotel')
 const totalPrice=booking.totalPrice
 const {origin}=req.headers;
 
-const stripeInstance=new stripePayment(process.env.STRIPE_SECRET_KEY)
+const stripeInstance=new Stripe(process.env.STRIPE_SECRET_KEY)
 
 const line_items=[
   {
