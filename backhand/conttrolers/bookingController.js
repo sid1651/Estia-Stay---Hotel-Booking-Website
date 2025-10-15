@@ -2,7 +2,7 @@ import transporter from "../config/nodemailer.js";
 import Booking from "../models/Booking.js";
 import Hotel from "../models/stay.js";
 import Room from "../models/Room.js";
-import Stripe from "stripe";
+import stripe from "stripe";
 
 const checkAvailability = async ({ checkInDate, checkOutDate, room }) => {
   try {
@@ -163,7 +163,7 @@ const line_items=[
   }
 ]
 
-const session =await stripeInstance.checkout.sessions.creat({
+const session =await stripeInstance.checkout.sessions.create({
   line_items,
   mode:'payment',
   success_url:`${origin}/loader/my-bookings`,
