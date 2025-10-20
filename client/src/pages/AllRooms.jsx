@@ -122,7 +122,7 @@ const AllRooms = () => {
     <div className="filters-box">
       <div className="filters-header">
         <h2>Filters</h2>
-        <span className="clear-filter">Clear</span>
+          <span className="clear-filter" onClick={clearFilters} style={{cursor: 'pointer'}}>Clear</span>
       </div>
 
       <div className="filters-content">
