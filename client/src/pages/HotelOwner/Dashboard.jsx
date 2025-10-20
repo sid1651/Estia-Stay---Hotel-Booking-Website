@@ -14,6 +14,7 @@ const Dashboard = () => {
         try{
 const {data}=await axios.get('/api/bookings/hotel',{headers:{Authorization:`Bearer ${await getToken()}`}})
 if(data.success){
+    console.log(data.dashboardData)
     setDashboardData(data.dashboardData)
 }else{
     toast.error(error.message)
@@ -46,8 +47,8 @@ if(user){
         <div className="stat-card">
             <img src={assets.totalRevenueIcon} className="stat-icon" alt="Total Revenue"/>
             <div className="stat-info">
-                <p className="stat-label">Total Revenu</p>
-                <p className="stat-value">{currency}{dashboardData.totalRevenue}</p>
+                <p className="stat-label">Total Revenue</p>
+                <p className="stat-value">{currency}{dashboardData.totalRevenu}</p>
             </div>
         </div>
       </div>

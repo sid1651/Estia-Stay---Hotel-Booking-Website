@@ -94,12 +94,13 @@ const AllRooms = () => {
     </label>
     )
   }
-  const roomTypes=[
-    'Singel Bed',
-    'Doubule Bed',
-    'Luxury Room',
-    'Family Suites',
-  ]
+  const roomTypes = [
+  'Single',
+  'Double',
+  'Luxury',
+  'Family Suites', // match your actual data
+]
+
 
   const priceRange=[
     '0 to 500',
