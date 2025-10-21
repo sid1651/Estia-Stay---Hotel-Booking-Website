@@ -1,198 +1,228 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { assets, facilityIcons, roomsDummyData } from '../assets/assets'
 import { useNavigate, useSearchParams } from 'react-router'
 import StarRating from '../components/StarRating';
 import { useAppContext } from '../context/AppContext';
 
 const AllRooms = () => {
-  const [searchParams,setSeacrcParams]=useSearchParams();
-  const {rooms,navigate,currency}=useAppContext();
-  const [openFilters,setOpenFilters]=useState(false);
-  const [selectedFilters,setSelectedFilters]=useState({
-    roomType:[],
-    priceRange:[],
-  })
-  const [selectedsort,setSelectedSort]=useState('');
+  const [searchParams, setSeacrcParams] = useSearchParams();
+  const { rooms, navigate, currency } = useAppContext();
+  const [openFilters, setOpenFilters] = useState(false);
 
+  const [selectedFilters, setSelectedFilters] = useState({
+    roomType: [],
+    priceRange: [],
+  });
 
-  const handleFilterChange=(checked,value,type)=>{
-    setSelectedFilters((prevFilters)=>{
-      const updatedFilters={...prevFilters};
-      if(checked){
+  const [selectedsort, setSelectedSort] = useState('');
+  
+  const [currentPage, setCurrentPage] = useState(1);
+  const roomsPerPage = 3; // rooms per page
+
+  const handleFilterChange = (checked, value, type) => {
+    setSelectedFilters((prevFilters) => {
+      const updatedFilters = { ...prevFilters };
+      if (checked) {
         updatedFilters[type].push(value);
-      }else{
-        updatedFilters[type]=updatedFilters[type].filter(item=>item!==value)
+      } else {
+        updatedFilters[type] = updatedFilters[type].filter(item => item !== value);
       }
-      return updatedFilters
-    })
+      return updatedFilters;
+    });
   }
 
-  const handelSortChange=(sortOption)=>{
-    setSelectedSort(sortOption)
+  const handelSortChange = (sortOption) => {
+    setSelectedSort(sortOption);
   }
 
-  const matchesRoomType=(room)=>{
-    return selectedFilters.roomType.length===0||selectedFilters.roomType.includes(room.roomType)
+  const matchesRoomType = (room) => {
+    return selectedFilters.roomType.length === 0 ||
+      selectedFilters.roomType.includes(room.roomType);
   }
 
-
-  const matchesPriceRange=(room)=>{
-    return selectedFilters.priceRange.length===0||selectedFilters.priceRange.some(range=>{
-      const [min,max]=range.split(' to ').map(Number)
-      return room.pricePerNight>=min && room.pricePerNight<=max
-    })
+  const matchesPriceRange = (room) => {
+    return selectedFilters.priceRange.length === 0 ||
+      selectedFilters.priceRange.some(range => {
+        const [min, max] = range.split(' to ').map(Number);
+        return room.pricePerNight >= min && room.pricePerNight <= max;
+      });
   }
 
-  const sortRooms=(a,b)=>{
-    if(selectedsort==='Price Low to High'){
-      return a.pricePerNight-b.pricePerNight;
-    }else if(selectedsort==="Price High to Low"){
-      return b.pricePerNight-a.pricePerNight
-    }else if(selectedsort==='Newest First'){
-      return new Date(b.createdAt)-new Date(a.createdAt)
-    }
+  const sortRooms = (a, b) => {
+    if (selectedsort === 'Price Low to High') return a.pricePerNight - b.pricePerNight;
+    if (selectedsort === 'Price High to Low') return b.pricePerNight - a.pricePerNight;
+    if (selectedsort === 'Newest First') return new Date(b.createdAt) - new Date(a.createdAt);
     return 0;
   }
-  const filterDestination=(room)=>{
-    const destination =searchParams.get('destination');
-    if(!destination)return true;
-    return room.hotel.city.toLowerCase().includes(destination.toLowerCase())
+
+  const filterDestination = (room) => {
+    const destination = searchParams.get('destination');
+    if (!destination) return true;
+    return room.hotel.city.toLowerCase().includes(destination.toLowerCase());
   }
 
+  const filteredRooms = useMemo(() => {
+    return rooms
+      .filter(room => matchesRoomType(room) && matchesPriceRange(room) && filterDestination(room))
+      .sort(sortRooms);
+  }, [rooms, selectedFilters, selectedsort, searchParams]);
 
-  const filteredRooms =useMemo(()=>{
-    return rooms.filter(room=>matchesRoomType(room)&& matchesPriceRange(room)&& filterDestination(room)).sort(sortRooms);
-  },[rooms,selectedFilters,selectedsort,searchParams])
+  // Pagination
+  const totalPages = Math.ceil(filteredRooms.length / roomsPerPage);
+  const paginatedRooms = useMemo(() => {
+    const startIndex = (currentPage - 1) * roomsPerPage;
+    return filteredRooms.slice(startIndex, startIndex + roomsPerPage);
+  }, [filteredRooms, currentPage]);
 
+  // Reset page on filter/sort/search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilters, selectedsort, searchParams]);
 
-  const clearFilters=()=>{
-    setSelectedFilters({
-      roomType:[],
-      priceRange:[]
-    })
-    setSelectedSort('')
-    setSeacrcParams({})
+  const clearFilters = () => {
+    setSelectedFilters({ roomType: [], priceRange: [] });
+    setSelectedSort('');
+    setSeacrcParams(new URLSearchParams());
   }
 
-
-
-    const CheckBox=({label,selected=false,onChange=()=>{}})=>{
-    return(
+  const CheckBox = ({ label, selected = false, onChange = () => {} }) => (
     <label>
-        <input type='checkbox' checked={selected} onChange={(e)=>onChange(e.target.checked,label)}/>
-        <span>{label}</span>
+      <input type='checkbox' checked={selected} onChange={(e) => onChange(e.target.checked, label)} />
+      <span>{label}</span>
     </label>
-    )
-  }
+  );
 
-
-  const RadioButton=({label,selected=false,onChange=()=>{}})=>{
-    return(
+  const RadioButton = ({ label, selected = false, onChange = () => {} }) => (
     <label>
-        <input type='radio' name='sortOption'checked={selected} onChange={()=>onChange(label)}/>
-        <span>{label}</span>
+      <input type='radio' name='sortOption' checked={selected} onChange={() => onChange(label)} />
+      <span>{label}</span>
     </label>
-    )
-  }
-  const roomTypes = [
-  'Single',
-  'Double',
-  'Luxury',
-  'Family Suites', // match your actual data
-]
+  );
 
+  const roomTypes = ['Single', 'Double', 'Luxury', 'Family Suites'];
+  const priceRange = ['0 to 500', '500 to 1000', '1000 to 2000', '2000 to 3000'];
+  const sortOptions = ['Price Low to High', 'Price High to Low', 'Newest First'];
 
-  const priceRange=[
-    '0 to 500',
-    '500 to 1000',
-    '1000 to 2000',
-    '2000 to 3000',
-  ]
-
-  const sortOptions=[
-    'Price Low to High',
-    'Price High to Low',
-    'Newest First'
-  ]
   return (
     <div className="all-rooms-container">
-  <div className="rooms-layout">
-    
-    {/* Filters Section */}
-    <div className="filters-box">
-      <div className="filters-header">
-        <h2>Filters</h2>
-          <span className="clear-filter" onClick={clearFilters} style={{cursor: 'pointer'}}>Clear</span>
-      </div>
+      <div className="rooms-layout">
 
-      <div className="filters-content">
-        <p className="filter-title">Popular Filters</p>
-        <p className="filter-title">Room Type</p>
-        {roomTypes.map((room, index) => (
-          <CheckBox key={index} label={room} selected={selectedFilters.roomType.includes(room)} onChange={(checked)=>handleFilterChange(checked,room,'roomType')}/>
-        ))}
-
-        <p className="filter-title">Price Range</p>
-        {priceRange.map((range, index) => (
-          <CheckBox key={index} label={`$${range}`} selected={selectedFilters.priceRange.includes(range)} onChange={(checked)=>{
-            handleFilterChange(checked,range,'priceRange')
-          }} />
-        ))}
-
-        <p className="filter-title">Sort By</p>
-        {sortOptions.map((option, index) => (
-          <RadioButton key={index} label={option} selected={selectedsort===option}onChange={()=>handelSortChange(option)} />
-        ))}
-      </div>
-    </div>
-
-    {/* Rooms Section */}
-    <div className="rooms-list">
-      {filteredRooms.map((room) => (
-        <div className="room-card" key={room._id}>
-          <div className="room-image-wrapper">
-            <img
-              src={room.images[0]}
-              alt="hotel-img"
-              onClick={() => {
-                navigate(`/rooms/${room._id}`);
-                scrollTo(0, 0);
-              }}
-            />
+        {/* Filters Section */}
+        <div className="filters-box">
+          <div className="filters-header">
+            <h2>Filters</h2>
+            <span className="clear-filter" onClick={clearFilters} style={{ cursor: 'pointer' }}>Clear</span>
           </div>
-          <div className="room-info">
-            <p className="room-city">{room.hotel.city}</p>
-            <p className="room-name">{room.hotel.name}</p>
 
-            <div className="room-reviews">
-              <StarRating />
-              <p>200+ reviews</p>
-            </div>
+          <div className="filters-content">
+            <p className="filter-title">Room Type</p>
+            {roomTypes.map((room, index) => (
+              <CheckBox
+                key={index}
+                label={room}
+                selected={selectedFilters.roomType.includes(room)}
+                onChange={(checked) => handleFilterChange(checked, room, 'roomType')}
+              />
+            ))}
 
-            <div className="room-address">
-              <img src={assets.locationIcon} alt="location-icon" />
-              <span>{room.hotel.address}</span>
-            </div>
+            <p className="filter-title">Price Range</p>
+            {priceRange.map((range, index) => (
+              <CheckBox
+                key={index}
+                label={`$${range}`}
+                selected={selectedFilters.priceRange.includes(range)}
+                onChange={(checked) => handleFilterChange(checked, range, 'priceRange')}
+              />
+            ))}
 
-            <div className="amenities">
-              {room.amenities?.map((item, index) => (
-                <div className="amenity" key={index}>
-                  <img src={facilityIcons[item]} alt={item} />
-                  <p>{item}</p>
-                </div>
-              ))}
-            </div>
-
-            <p className="aminities-p">${room.pricePerNight}</p>
-            <p>/Day</p>
+            <p className="filter-title">Sort By</p>
+            {sortOptions.map((option, index) => (
+              <RadioButton
+                key={index}
+                label={option}
+                selected={selectedsort === option}
+                onChange={() => handelSortChange(option)}
+              />
+            ))}
           </div>
         </div>
-      ))}
+
+        {/* Rooms Section */}
+        <div className="rooms-list">
+          {paginatedRooms.map((room) => (
+            <div className="room-card" key={room._id}>
+              <div className="room-image-wrapper">
+                <img
+                  src={room.images[0]}
+                  alt="hotel-img"
+                  onClick={() => {
+                    navigate(`/rooms/${room._id}`);
+                    scrollTo(0, 0);
+                  }}
+                />
+              </div>
+              <div className="room-info">
+                <p className="room-city">{room.hotel.city}</p>
+                <p className="room-name">{room.hotel.name}</p>
+
+                <div className="room-reviews">
+                  <StarRating />
+                  <p>200+ reviews</p>
+                </div>
+
+                <div className="room-address">
+                  <img src={assets.locationIcon} alt="location-icon" />
+                  <span>{room.hotel.address}</span>
+                </div>
+
+                <div className="amenities">
+                  {room.amenities?.map((item, index) => (
+                    <div className="amenity" key={index}>
+                      <img src={facilityIcons[item]} alt={item} />
+                      <p>{item}</p>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="aminities-p">${room.pricePerNight}</p>
+                <p>/Day</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Pagination Controls */}
+       
+
+      </div>
+       {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+
+            {[...Array(totalPages)].map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentPage(idx + 1)}
+                className={currentPage === idx + 1 ? 'active' : ''}
+              >
+                {idx + 1}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        )}
     </div>
-
-  </div>
-</div>
-
   );
 };
 

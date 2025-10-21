@@ -2535,6 +2535,46 @@ width: 12vw;
   height: 18px;
 }
 
+/* Pagination container */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 20px 0;
+  flex-wrap: wrap;
+}
+
+/* Pagination buttons */
+.pagination button {
+  border: 1px solid #ddd;
+  background-color: #fff;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+/* Hover effect */
+.pagination button:hover:not(:disabled) {
+  background-color: #f0f0f0;
+}
+
+/* Active page */
+.pagination button.active {
+  background-color: #007bff;
+  color: #fff;
+  border-color: #007bff;
+}
+
+/* Disabled button */
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+
 
 
 
